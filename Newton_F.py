@@ -14,7 +14,7 @@ from time import process_time
 #                                                                           #
 #############################################################################
 
-from Visualg import Visualg
+from .Visualg import Visualg
 
 
 def Newton_F(Oracle, x0):

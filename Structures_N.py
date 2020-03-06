@@ -31,7 +31,7 @@ from numpy.linalg import inv
 #
 # Probleme_R : probleme realiste
 
-from Probleme_R import *
+from .Probleme_R import *
 
 # Matrice d'incidence et sous-matrices associees
 
