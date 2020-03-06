@@ -33,7 +33,7 @@ from numpy.linalg import inv
 
 from Probleme_R import *
 
-##### Matrice d'incidence et sous-matrices associees
+# Matrice d'incidence et sous-matrices associees
 
 # Matrice d'incidence noeuds-arcs du graphe
 A = zeros((m, n))
@@ -42,22 +42,21 @@ for i in range(m):
     A[i, dest == i] = +1
 
 # Partition de A suivant le type des noeuds
-Ar = A[:mr,:]
-Ad = A[mr:m,:]
+Ar = A[:mr, :]
+Ad = A[mr:m, :]
 
 # Sous-matrice de Ad associee a un arbre et inverse
-AdT = Ad[:,:md]
+AdT = Ad[:, :md]
 AdI = inv(AdT)
 
 # Sous matrice de Ad associee a un coarbre
-AdC = Ad[:,md:n]
+AdC = Ad[:, md:n]
 
 # Matrice d'incidence arcs-cycles
 B = zeros((n, n-md))
-B[:md,:] = -dot(AdI, AdC)
-B[md:,:] = eye(n-md)
+B[:md, :] = -dot(AdI, AdC)
+B[md:, :] = eye(n-md)
 
-##### Vecteur des debits admissibles
+# Vecteur des debits admissibles
 q0 = zeros(n)
-q0[:md] = dot(AdI,fd)
-
+q0[:md] = dot(AdI, fd)
