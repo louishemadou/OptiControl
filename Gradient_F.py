@@ -13,7 +13,7 @@ from time import process_time
 #                                                                           #
 #############################################################################
 
-from .Visualg import Visualg
+from Visualg import Visualg
 
 
 def Gradient_F(Oracle, x0):
