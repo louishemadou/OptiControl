@@ -1,7 +1,7 @@
 import numpy as np
 
-from .Probleme_R import *
-from .Structures_N import *
+from Problemes_R import *
+from Structures_N import *
 
 
 def OraclePG(qc, ind):
