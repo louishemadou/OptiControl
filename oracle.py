@@ -13,3 +13,15 @@ def OraclePG(qc, ind):
     if ind == 3 or ind == 4:
         G = np.dot(B.T, r*q*np.abs(q)) + np.dot(np.dot(B.T, Ar.T), pr)
     return [F, G, ind]
+
+def OraclePH(qc, ind):
+    F, G, H = 0, 0, 0
+    if ind < 4:
+        [F, G, ind] = OraclePG(qc, ind)
+    elif ind == 6:
+        [F, G, ind] = OraclePG(qc, 3)
+    elif ind == 7:
+        [F, G, ind] = OraclePG(qc, 4)
+    if ind in [5, 6, 7]:
+        H = 2*np.dot(B.T, (np.diag(r)*np.diag(np.abs(q))*B.T).T)
+    return [F, G, H, ind]
