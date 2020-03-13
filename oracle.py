@@ -15,6 +15,7 @@ def OraclePG(qc, ind):
     return [F, G, ind]
 
 def OraclePH(qc, ind):
+    q = q0 + np.dot(B, qc)
     F, G, H = 0, 0, 0
     if ind < 4:
         [F, G, ind] = OraclePG(qc, ind)
@@ -23,5 +24,5 @@ def OraclePH(qc, ind):
     elif ind == 7:
         [F, G, ind] = OraclePG(qc, 4)
     if ind in [5, 6, 7]:
-        H = 2*np.dot(B.T, (np.diag(r)*np.diag(np.abs(q))*B.T).T)
+        H = 2*np.dot(B.T, np.dot(np.diag(r*np.abs(q)), B))
     return [F, G, H, ind]
