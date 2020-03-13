@@ -23,13 +23,14 @@ from numpy.linalg import norm
 #  Arguments en sortie
 #
 #    alphan : valeur du pas apres recherche lineaire
-#    ok     : indicateur de reussite de la recherche 
+#    ok     : indicateur de reussite de la recherche
 #             = 1 : conditions de Wolfe verifiees
 #             = 2 : indistinguabilite des iteres
 
+
 def Wolfe(alpha, x, D, Oracle):
-    
-    ##### Coefficients de la recherche lineaire
+
+    # Coefficients de la recherche lineaire
 
     omega_1 = 0.1
     omega_2 = 0.9
@@ -40,45 +41,47 @@ def Wolfe(alpha, x, D, Oracle):
     ok = 0
     dltx = 0.00000001
 
-    ##### Algorithme de Fletcher-Lemarechal
-    
+    # Algorithme de Fletcher-Lemarechal
+
     # Appel de l'oracle au point initial
     argout = Oracle(x)
     critere = argout[0]
     gradient = argout[1]
-    
+
     # Initialisation de l'algorithme
     alpha_n = alpha
     xn = x
-    
+
     # Boucle de calcul du pas
     # xn represente le point pour la valeur courante du pas,
     # xp represente le point pour la valeur precedente du pas.
     while ok == 0:
-        
+
         # Point precedent pour tester l'indistinguabilite
         xp = xn
-        
+
         # Point actuel
         xn = x + alpha_n*D
-        
+
         # Calcul des conditions de Wolfe
-        #
-        # ---> A completer...
-        # ---> A completer...
-        
-        # Test des conditions de Wolfe
-        #
-        # - Si les deux conditions de Wolfe sont verifiees,
-        #   poser ok = 1 : on sort alors de la boucle while
-        # - Sinon, modifier la valeur de alphan et reboucler
-        #
-        # ---> A completer...
-        # ---> A completer...
-        
+        argout_xn = Oracle(xn)
+        critere_xn = argout[0]
+        gradient_xn = argout[1]
+        if critere_xn > critere + omega_1*alpha_n*np.dot(gradient.T, D):
+            alpha_max = alpha_n
+            alpha_n = 1/2*(alpha_max + alpha_min)
+        else:
+            if np.dot(gradient_xn.T, D) < omega_2*np.dot(gradient.T, D):
+                alpha_min = alpha_n
+                if alpha_max == np.inf:
+                    alpha_n = 2*alpha_min
+                else:
+                    alpha_n = 1/2*(alpha_min + alpha_max)
+            else:
+                ok = 1
+
         # Test d'indistinguabilite
         if norm(xn - xp) < dltx:
             ok = 2
 
     return alpha_n, ok
-
