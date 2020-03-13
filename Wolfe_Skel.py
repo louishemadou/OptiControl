@@ -85,3 +85,15 @@ def Wolfe(alpha, x, D, Oracle):
             ok = 2
 
     return alpha_n, ok
+
+def Polak_Ribiere(Oracle, x0):
+    argout = Oracle(x0)
+    critere = argout[0]
+    gradient = argout[1]
+    eps = 0.000001
+    k = 0
+    while norm(gradient) > eps:
+        if k==1:
+            D = - gradient
+        else:
+
