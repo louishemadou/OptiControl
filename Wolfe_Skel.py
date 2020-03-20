@@ -88,12 +88,38 @@ def Wolfe(alpha, x, D, Oracle):
 
 def Polak_Ribiere(Oracle, x0):
     argout = Oracle(x0)
-    critere = argout[0]
-    gradient = argout[1]
+    u_k = argout[0]
+    gradient_k = argout[1]
     eps = 0.000001
-    k = 0
-    while norm(gradient) > eps:
-        if k==1:
-            D = - gradient
+    k = 1
+    while norm(gradient_k) > eps:
+        if k == 1:
+            alpha = 1
+            d = - gradient_k
+            k += 1
         else:
+            gradient_k_1 = gradient_k
+            gradient_k = Oracle(u_k)[1]
+            beta = np.dot(gradient_k.T, gradient_k - gradient_k_1)/norm(gradient_k_1)**2
+            d = - gradient_k + np.dot(beta, d)
+            alpha_k = Wolfe(alpha, u_k, d, Oracle)
+        u_k_1 = u_k
+        u_k = u_k_1 + np.dot(alpha_k, d)
+    argout = Oracle(u_k)
+    return [argout[0], u_k, argout[1]]
 
+def Newton(Oracle, x0):
+    eps = 0.000001
+    argout = Oracle(x0)
+    u_k = x0
+    gradient = argout[1]
+    hessienne = argout[2]
+    alpha = 1
+    while norm(gradient) > eps:
+        if np.det(hessienne) == 0:
+            raise ValueError("La hessienne n'est pas inversible")
+        else:
+            d = np.dot(np.inv(hessienne), gradient)
+            u_k += np.dot(Wolfe(alpha, u_k, d, Oracle), d)
+    argout = Oracle(u_k)
+    return [argout[0], u_k, argout[1]]
