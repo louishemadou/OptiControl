@@ -67,16 +67,16 @@ def Wolfe(alpha, x, D, Oracle):
         argout_xn = Oracle(xn)
         critere_xn = argout[0]
         gradient_xn = argout[1]
-        if critere_xn > critere + omega_1*alpha_n*np.dot(gradient.T, D):
+        if critere_xn > critere + omega_1*alpha_n*np.dot(gradient, D):
             alpha_max = alpha_n
             alpha_n = 1/2*(alpha_max + alpha_min)
         else:
-            if np.dot(gradient_xn.T, D) < omega_2*np.dot(gradient.T, D):
+            if np.dot(gradient_xn, D) < omega_2*np.dot(gradient, D):
                 alpha_min = alpha_n
                 if alpha_max == np.inf:
                     alpha_n = 2*alpha_min
                 else:
-                    alpha_n = 1/2*(alpha_min + alpha_max)
+                    alpha_n = (1/2)*(alpha_min + alpha_max)
             else:
                 ok = 1
 
@@ -88,7 +88,7 @@ def Wolfe(alpha, x, D, Oracle):
 
 def Polak_Ribiere(Oracle, x0):
     argout = Oracle(x0)
-    u_k = argout[0]
+    u_k = x0
     gradient_k = argout[1]
     eps = 0.000001
     k = 1
@@ -100,9 +100,9 @@ def Polak_Ribiere(Oracle, x0):
         else:
             gradient_k_1 = gradient_k
             gradient_k = Oracle(u_k)[1]
-            beta = np.dot(gradient_k.T, gradient_k - gradient_k_1)/norm(gradient_k_1)**2
-            d = - gradient_k + np.dot(beta, d)
-            alpha_k = Wolfe(alpha, u_k, d, Oracle)
+            beta = np.dot(gradient_k, gradient_k - gradient_k_1)/norm(gradient_k_1)**2
+            d = - gradient_k + beta*d
+            alpha_k, _ = Wolfe(alpha, u_k, d, Oracle)
         u_k_1 = u_k
         u_k = u_k_1 + np.dot(alpha_k, d)
     argout = Oracle(u_k)
@@ -116,10 +116,11 @@ def Newton(Oracle, x0):
     hessienne = argout[2]
     alpha = 1
     while norm(gradient) > eps:
+        _, gradient, hessienne = Oracle(u_k)
         if np.det(hessienne) == 0:
             raise ValueError("La hessienne n'est pas inversible")
         else:
             d = np.dot(np.inv(hessienne), gradient)
-            u_k += np.dot(Wolfe(alpha, u_k, d, Oracle), d)
+            u_k -= Wolfe(alpha, u_k, -d, Oracle)[0]*d
     argout = Oracle(u_k)
     return [argout[0], u_k, argout[1]]
