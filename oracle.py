@@ -13,6 +13,6 @@ def OraclePG(qc):
 
 def OraclePH(qc):
     q = q0 + np.dot(B, qc)
-    [F, G, ind] = OraclePG(qc)
+    F,G = OraclePG(qc)
     H = 2*np.dot(B.T, np.dot(np.diag(r*np.abs(q)), B))
     return F, G, H

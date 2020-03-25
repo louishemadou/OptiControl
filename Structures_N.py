@@ -54,7 +54,7 @@ AdC = Ad[:, md:n]
 
 # Matrice d'incidence arcs-cycles
 B = zeros((n, n-md))
-B[:md, :] = -dot(AdI, AdC)
+B[:md, :] = -1 * dot(AdI, AdC)
 B[md:, :] = eye(n-md)
 
 # Vecteur des debits admissibles
