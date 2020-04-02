@@ -27,101 +27,46 @@ from numpy.linalg import norm
 #             = 1 : conditions de Wolfe verifiees
 #             = 2 : indistinguabilite des iteres
 
-
-def Wolfe(alpha, x, D, Oracle):
+def Wolfe(alpha, x, D, oracle):
 
     # Coefficients de la recherche lineaire
-
     omega_1 = 0.1
     omega_2 = 0.9
-
     alpha_min = 0
     alpha_max = np.inf
-
     ok = 0
-    dltx = 0.00000001
-
-    # Algorithme de Fletcher-Lemarechal
-
-    # Appel de l'oracle au point initial
-    argout = Oracle(x)
-    critere = argout[0]
-    gradient = argout[1]
+    eps = 0.00000001
+    
+    loss, gradient = oracle(x)[:2] # Loss et gradient au point initial
 
     # Initialisation de l'algorithme
     alpha_n = alpha
-    xn = x
+    x_n = x
 
-    # Boucle de calcul du pas
-    # xn represente le point pour la valeur courante du pas,
-    # xp represente le point pour la valeur precedente du pas.
-    while ok == 0:
-
-        # Point precedent pour tester l'indistinguabilite
-        xp = xn
-
+    while ok == 0: # Tant qu'on n'a pas trouvé de pas satisfaisant
+        # Point précédent pour tester l'indistinguabilité
+        x_pre = x_n
         # Point actuel
-        xn = x + alpha_n*D
-
-        # Calcul des conditions de Wolfe
-        argout_xn = Oracle(xn)
-        critere_xn = argout[0]
-        gradient_xn = argout[1]
-        if critere_xn > critere + omega_1*alpha_n*np.dot(gradient, D):
-            alpha_max = alpha_n
-            alpha_n = 1/2*(alpha_max + alpha_min)
-        else:
-            if np.dot(gradient_xn, D) < omega_2*np.dot(gradient, D):
+        x_n = x + alpha_n*D
+        loss_n, gradient_n = oracle(x_n)[:2]
+        
+        if loss_n - loss <= omega_1 * alpha_n * np.dot(gradient, D): # 1ere cond de Wolfe
+            if np.dot(gradient_n, D) >= omega_2 * np.dot(gradient, D): # 2eme cond de Wolf
+                ok = 1
+            else:
                 alpha_min = alpha_n
                 if alpha_max == np.inf:
                     alpha_n = 2*alpha_min
                 else:
-                    alpha_n = (1/2)*(alpha_min + alpha_max)
-            else:
-                ok = 1
-
+                    alpha_n = (1/2) * (alpha_min + alpha_max)
+        else:
+            alpha_max = alpha_n
+            alpha_n = (1/2) * (alpha_min + alpha_max)
+        
         # Test d'indistinguabilite
-        if norm(xn - xp) < dltx:
+        if np.linalg.norm(x_n - x_pre) < eps:
             ok = 2
 
     return alpha_n, ok
 
-def Polak_Ribiere(Oracle, x0):
-    argout = Oracle(x0)
-    u_k = x0
-    gradient_k = argout[1]
-    eps = 0.000001
-    k = 1
-    while norm(gradient_k) > eps:
-        if k == 1:
-            alpha_k = 1
-            d = - gradient_k
-            k += 1
-        else:
-            gradient_k_1 = gradient_k
-            gradient_k = Oracle(u_k)[1]
-            beta = np.dot(gradient_k, gradient_k - gradient_k_1)/norm(gradient_k_1)**2
-            d = - gradient_k + beta*d
-            alpha_k, _ = Wolfe(alpha_k, u_k, d, Oracle)
-        u_k_1 = u_k
-        u_k = u_k_1 + np.dot(alpha_k, d)
-    argout = Oracle(u_k)
-    return [argout[0], u_k, argout[1]]
 
-def Newton(Oracle, x0):
-    eps = 0.000001
-    argout = Oracle(x0)
-    u_k = x0
-    gradient = argout[1]
-    hessienne = argout[2]
-    alpha = 1
-    while norm(gradient) > eps:
-        _, gradient, hessienne = Oracle(u_k)
-        if np.linalg.det(hessienne) == 0:
-            raise ValueError("La hessienne n'est pas inversible")
-        else:
-            d = np.dot(np.linalg.inv(hessienne), gradient)
-            u_k -= Wolfe(alpha, u_k, -d, Oracle)[0]
-        print(norm(gradient))
-    argout = Oracle(u_k)
-    return [argout[0], u_k, argout[1]]
