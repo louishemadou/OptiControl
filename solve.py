@@ -6,8 +6,7 @@ from Gradient_F import Gradient_F
 
 from time import process_time
 
-def solve(method, oracle, visual=False):
-    x0 = np.random.normal(size=n - md)
+def solve(x0, method, oracle, visual=False):
     time_start = process_time()
     if method == "BFGS":
         F, x, G = bfgs(oracle, x0, visual=visual)
@@ -23,6 +22,8 @@ def solve(method, oracle, visual=False):
 
 
 if __name__ == '__main__':
-    F, x, G = solve("BFGS", OracleDG, visual=True)
+    x0_P = np.random.normal(size = n - md)
+    x0_D = np.random.normal(size = md)
+    F, x, G = solve(x0_D, "BFGS", OracleDG, visual=True)
     print("Critère optimal = " + str(F))
     print("Optimal au point " + str(x))
