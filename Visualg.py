@@ -34,5 +34,5 @@ def Visualg(gradient_list, step_list, critere_list):
     plt.gca().set_yscale('log')
     plt.plot(step_list, label="Longueur du pas")
 
-    plt.tight_layout(rect=(0, 0, 1, 2))
+    plt.tight_layout()#rect=(0, 0, 1, 2))
     plt.show()

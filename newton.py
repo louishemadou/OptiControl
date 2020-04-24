@@ -27,7 +27,6 @@ def Newton(oracle, x0, n_iter_max = 5000, eps = 1e-5, visual = False):
         gradient_norm_list.append(np.linalg.norm(gradient_n))
         gradient_step_list.append(alpha_n)
         loss_list.append(loss_n)
-        print(np.linalg.norm(gradient_n))
         n += 1
 
     # Résultats

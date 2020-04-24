@@ -16,11 +16,11 @@ from time import process_time
 from Visualg import Visualg
 import oracle
 
-def Gradient_F(Oracle, x0):
+def Gradient_F(Oracle, x0, visual = False):
 
     # Initialisation des variables
 
-    iter_max = 10000
+    iter_max = 5000
     gradient_step = 0.0005
     threshold = 0.000001
 
@@ -69,6 +69,6 @@ def Gradient_F(Oracle, x0):
     print('Norme du gradient :', norm(gradient_opt))
 
     # Visualisation de la convergence
-    Visualg(gradient_norm_list, gradient_step_list, critere_list)
-
+    if visual:
+        Visualg(gradient_norm_list, gradient_step_list, critere_list)
     return critere_opt, gradient_opt, x_opt
